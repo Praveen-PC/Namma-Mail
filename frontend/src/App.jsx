@@ -7,6 +7,7 @@ import Register from './components/users/Register'
 import Login from './components/users/Login';
 import PrivateRouter from './components/users/PrivateRouter';
 import Dashboard from './components/dashboard/Dashboard';
+import Admin from './components/dashboard/Admin';
 
 
 
@@ -22,8 +23,8 @@ const App = () => {
 
     
       <Route path='/dashboard' element={<PrivateRouter><Dashboard/></PrivateRouter>}/>
-      {/* <Route path='/tickets/:ticketStatus'  element={<PrivateRouter ><Dashboard/></PrivateRouter>} />
-      <Route path='/userdetails' element={<PrivateRouter><Userdetails/></PrivateRouter>}/> */}
+       <Route path='/adminpanel'  element={<PrivateRouter ><Admin/></PrivateRouter>}/>
+
       
     
     </Routes>

@@ -30,6 +30,7 @@ const addmail = async (req, res) => {
 
   const getSendMail = async (req, res) => {
     const { mail } = req.params;
+    console.log(mail)
     try {
       const sql = "SELECT * FROM mailinfo WHERE sendby = ?";
       const [data] = await db.query(sql, [mail]);
@@ -39,6 +40,44 @@ const addmail = async (req, res) => {
     }
   };
   
-  
 
-  module.exports={addmail,getInboxMail,getSendMail}
+  const getEmailAddress=async(req,res)=>{
+    try{
+      const sql='SELECT * FROM userdetails'
+      const [data]=await db.query(sql)
+      res.status(200).send(data)
+
+    }catch(error){
+      req.status(400).send(error)
+    }
+  }
+
+  // get all for admin
+
+  const getAllMailInfo=async(req,res)=>{
+    try{
+      const sql='SELECT * FROM mailinfo'
+      const [data]=await db.query(sql)
+      res.status(200).send(data)
+
+    }catch(error){
+      res.status(400).send(error)
+
+    }
+  }
+  
+  // delete an particular mail
+
+  const deletemail=async(req,res)=>{
+    const {id}=req.params
+    try{
+      const sql='DELETE FROM mailinfo WHERE id=?'
+      await db.query(sql,[id])
+      res.status(200).send('mail deleted successfully')
+
+    }catch(error){
+      res.status(400).send(error)
+    }
+  }
+
+  module.exports={addmail,getInboxMail,getSendMail,getEmailAddress,getAllMailInfo,deletemail}

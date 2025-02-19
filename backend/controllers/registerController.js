@@ -24,41 +24,41 @@ const postUser = async (req, res) => {
     }
 };
 
-const getUser = async (req, res) => {
-    try {
-        const sql = "SELECT * FROM userdetails";
-        const [users] = await db.query(sql);
+// const getUser = async (req, res) => {
+//     try {
+//         const sql = "SELECT * FROM userdetails";
+//         const [users] = await db.query(sql);
 
-        const userWithTicketCount = await Promise.all(users.map(async (user) => {
-            const ticketPerUser = "SELECT COUNT(*) AS ticketCount FROM ticketdetails WHERE user_id = ?";
-            const [ticketResult] = await db.query(ticketPerUser, [user.id]);
+//         const userWithTicketCount = await Promise.all(users.map(async (user) => {
+//             const ticketPerUser = "SELECT COUNT(*) AS ticketCount FROM ticketdetails WHERE user_id = ?";
+//             const [ticketResult] = await db.query(ticketPerUser, [user.id]);
 
-            return { ...user, ticketCount: ticketResult[0].ticketCount || 0 };
-        }));
+//             return { ...user, ticketCount: ticketResult[0].ticketCount || 0 };
+//         }));
 
-        res.status(200).send(userWithTicketCount);
-    } catch (error) {
-        res.status(500).send({ error: error.message });
-    }
-};
+//         res.status(200).send(userWithTicketCount);
+//     } catch (error) {
+//         res.status(500).send({ error: error.message });
+//     }
+// };
 
-const updateUser = async (req, res) => {
-    const { id } = req.params;
-    const { role } = req.body;
+// const updateUser = async (req, res) => {
+//     const { id } = req.params;
+//     const { role } = req.body;
 
-    try {
-        const sql = 'UPDATE userdetails SET role = ? WHERE id = ?';
-        const [result] = await db.query(sql, [role, id]);
+//     try {
+//         const sql = 'UPDATE userdetails SET role = ? WHERE id = ?';
+//         const [result] = await db.query(sql, [role, id]);
 
-        if (result.affectedRows === 0) {
-            return res.status(404).send({ message: "User not found" });
-        }
+//         if (result.affectedRows === 0) {
+//             return res.status(404).send({ message: "User not found" });
+//         }
 
-        res.status(200).send({ message: `Role updated to ${role}` });
-    } catch (error) {
-        res.status(500).send({ error: error.message });
-    }
-};
+//         res.status(200).send({ message: `Role updated to ${role}` });
+//     } catch (error) {
+//         res.status(500).send({ error: error.message });
+//     }
+// };
 
 const deleteUser = async (req, res) => {
     const { id } = req.params;
@@ -77,4 +77,4 @@ const deleteUser = async (req, res) => {
     }
 };
 
-module.exports = { postUser, getUser, updateUser, deleteUser };
+module.exports = { postUser,   deleteUser };

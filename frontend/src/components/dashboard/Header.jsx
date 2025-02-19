@@ -34,7 +34,7 @@ const Header = ({ handleMessageFilter, newMessage }) => {
           <div className="d-flex">
 
             <Link
-              to="/statusdashboard"
+              to="/dashboard"
               className="navbar-brand  h1 text-decoration-none fw-bold "
             >
               NammaMail

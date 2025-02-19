@@ -4,10 +4,15 @@ import Header from './Header';
 import Inbox from './Inbox';
 import Starred from './Starred';
 import Send from './Send';
+import DataTable from "react-data-table-component";
+import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
   const API_URL = import.meta.env.VITE_APP_URL;
   const [menu, setMenu] = useState('inbox');
+  const naviagte=useNavigate()
+  const [address, setAddress] = useState(false)
+  const [addressData, setAddressData] = useState([])
   const [user, setUser] = useState({
     userid: '',
     useremail: '',
@@ -28,8 +33,8 @@ const Dashboard = () => {
 
   const handleForm = async (e) => {
     e.preventDefault();
-    try {  
-      const data= { ...user, ...form }; 
+    try {
+      const data = { ...user, ...form };
       console.log(data)
       await axios.post(`${API_URL}/api/addmail`, data);
       resetForm()
@@ -37,15 +42,28 @@ const Dashboard = () => {
       console.log(error);
     }
   };
-  
-  
+
+
+  const fetchAddress = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/api/getaddress`);
+      setAddressData(response.data)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  // useEffect(()=>{
+  //    fetchAddress()
+  // },[address])
+
+console.log(addressData)
 
   useEffect(() => {
-    const token = sessionStorage.getItem('authtoken'); 
+    const token = sessionStorage.getItem('authtoken');
     if (token) {
       try {
-        const decode = token.split('.')[1]; 
-        const decodedToken = JSON.parse(atob(decode)); 
+        const decode = token.split('.')[1];
+        const decodedToken = JSON.parse(atob(decode));
         setUser({
           userid: decodedToken.id,
           useremail: decodedToken.email,
@@ -59,16 +77,35 @@ const Dashboard = () => {
       console.log('No token found');
     }
   }, []);
-  // console.log("user", user);
-const resetForm=()=>{
-  setForm({
-    to: '',
-    cc: '',
-    bcc: '',
-    subject: '',
-    content: ''
-  })
-}
+
+  const handleAddress = () => {
+    setAddress(true)
+    fetchAddress()
+  }
+  const handleCloseAddress = () => {
+    setAddress(false)
+  }
+
+  const resetForm = () => {
+    setForm({
+      to: '',
+      cc: '',
+      bcc: '',
+      subject: '',
+      content: ''
+    })
+  }
+
+  const handleAdmin=()=>{
+    naviagte('/adminpanel')
+  }
+
+  const columns = [
+    { name: "S.No", selector: (row, index) => index + 1, sortable: true, width: "80px" },
+    { name: "Name", selector: (row) => row.username, width: "150px" },
+    { name: "Email", selector: (row) => row.email, width: "200px" }, 
+  ];
+  
   return (
     <>
       <Header />
@@ -119,37 +156,64 @@ const resetForm=()=>{
             </div>
           </div>
 
-          <div className="col-12 col-md-9 p-3">
-            <div className="d-flex justify-content-between">
-              <div className="w-50">
-                <input type="search" className="form-control" placeholder="Search" />
+
+
+          {!address ? <>
+
+            <div className="col-12 col-md-9 p-3">
+              <div className="d-flex justify-content-between">
+                <div className="w-50">
+                  <input type="search" className="form-control" placeholder="Search" />
+                </div>
+                <div className="d-flex justify-content-evenly gap-3">
+                  {user.userrole === 'admin' ? (
+                    <>
+                      <button className="btn btn-warning" onClick={handleAdmin}>
+                        {/* <i className="fa-solid fa-users"></i> */}
+                        Admin
+                      </button>
+                    </>
+                  ) : ''}
+                  <button className="btn btn-warning">
+                    <i className="fa-regular fa-bell"></i>
+                  </button>
+                  <button className="btn btn-warning" onClick={handleAddress}>
+                    <i className="fa-regular fa-address-book"></i>
+                  </button>
+                </div>
               </div>
-              <div className="d-flex justify-content-evenly gap-4">
-                {user.userrole === 'admin' ? (
-                  <>
-                    <button className="btn btn-warning">
-                      <i className="fa-solid fa-users"></i>
-                    </button>
-                  </>
-                ) : ''}
-                <button className="btn btn-warning">
-                  <i className="fa-regular fa-bell"></i>
-                </button>
-                <button className="btn btn-warning">
-                  <i className="fa-regular fa-address-book"></i>
-                </button>
+
+
+              <div className="mt-3">
+                {menu === 'inbox' ? <Inbox user={user} /> : ''}
               </div>
+              <div className="mt-3">
+                {menu === 'starred' ? <Starred user={user} /> : ''}
+              </div>
+              <div className="mt-3">
+                {menu === 'send' ? <Send user={user} /> : ''}
+              </div>
+
+
             </div>
-            <div className="mt-3">
-              {menu === 'inbox' ? <Inbox user={user} /> : ''}
-            </div>
-            <div className="mt-5">
-              {menu === 'starred' ? <Starred  user={user}/> : ''}
-            </div>
-            <div className="mt-5">
-              {menu === 'send' ? <Send /> : ''}
-            </div>
-          </div>
+          </> : <>
+            <div className='conatiner p-3'>
+              <div className='d-flex text-center  gap-3'>
+                <h5 className=' fw-bold'>All Email Address</h5>
+                <small><button className='btn btn-warning btn-sm ' onClick={handleCloseAddress}><i class="fa-solid fa-xmark"></i></button></small>
+              </div>
+              <div className='mt-3 text-center border p-2 w-100 rounded ' style={{ maxHeight: "340px", overflowY: "auto" }}>
+
+               <DataTable
+               pagination
+               columns={columns}
+               data={addressData}
+               striped
+               responsive
+               highlightOnHover/>
+              </div>
+            </div></>}
+
         </div>
       </div>
 
