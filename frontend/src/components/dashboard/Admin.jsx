@@ -177,7 +177,7 @@ const Admin = () => {
                     </> : ""}
 
                     {menu === 'adduser' ? <>
-                        <div className='container d-flex  align-items-center  mt-5'>
+                        <div className='container d-flex  align-items-center  '>
                             <form className='rounded  p-4 border' onSubmit={handleSubmit}>
                                 <h5 className='fw-bold mb-4'>New User</h5>
 

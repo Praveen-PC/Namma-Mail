@@ -4,9 +4,9 @@
     "display": "standalone",
     "scope": "/",
     "start_url": "/",
-    "name": "Macsoft Ticketing System",
-    "short_name": "Macsoft TS",
-    "description": "Manage tickets efficiently with the Macsoft Ticketing System.",
+    "name": "NammaMail",
+    "short_name": "Mail",
+    "description": "",
     "icons": [
         {
             "src": "/assets/icon-192x192.png",

@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import axios from 'axios'
 import Header from './Header';
@@ -11,13 +12,19 @@ const Dashboard = () => {
   const API_URL = import.meta.env.VITE_APP_URL;
   const [menu, setMenu] = useState('inbox');
   const naviagte=useNavigate()
+  const [notification,setNotifivation]=useState(new Set())
   const [address, setAddress] = useState(false)
   const [addressData, setAddressData] = useState([])
+  const [editMail,setEditMail]=useState(false)
+  const [emailId,setEmailId]=useState(null)
+  const [searchMail,setSearchMail]=useState('')
+  
   const [user, setUser] = useState({
     userid: '',
     useremail: '',
     userrole: ''
   });
+   console.log(notification,"noti")
 
   const [form, setForm] = useState({
     to: '',
@@ -29,7 +36,14 @@ const Dashboard = () => {
 
   const handleChange = (option) => {
     setMenu(option);
+    
   };
+
+  const handleSearch=(e)=>{
+    const value=e.target.value
+    setSearchMail(value)
+  }
+  console.log('handlesearch',searchMail)
 
   const handleForm = async (e) => {
     e.preventDefault();
@@ -55,6 +69,22 @@ const Dashboard = () => {
   // useEffect(()=>{
   //    fetchAddress()
   // },[address])
+  // console.log("emailid",emailId)
+  const handleUpdateForm=async(e)=>{
+    e.preventDefault()
+    if(!emailId) return;
+    try{
+      await axios.put(`${API_URL}/api/updatemail/${emailId}`, form)
+      setEditMail(false)
+      setEmailId(null)
+      resetForm()
+      console.log("mail is updated")
+    }catch(error){
+      console.log(error)
+    }
+   
+    
+  }
 
 console.log(addressData)
 
@@ -160,24 +190,24 @@ console.log(addressData)
 
           {!address ? <>
 
-            <div className="col-12 col-md-9 p-3">
+            <div className="col-12 col-md-9 p-3" style={{ maxHeight: "420px", overflowY: "auto" }}>
               <div className="d-flex justify-content-between">
                 <div className="w-50">
-                  <input type="search" className="form-control" placeholder="Search" />
+                  <input type="search" className="form-control" value={searchMail} placeholder="Search" onChange={handleSearch}/>
                 </div>
                 <div className="d-flex justify-content-evenly gap-3">
                   {user.userrole === 'admin' ? (
                     <>
-                      <button className="btn btn-warning" onClick={handleAdmin}>
+                      <button className="btn btn-warning btn-sm" onClick={handleAdmin}>
                         {/* <i className="fa-solid fa-users"></i> */}
                         Admin
                       </button>
                     </>
                   ) : ''}
-                  <button className="btn btn-warning">
+                  <button className="btn btn-warning btn-sm"><span className='mx-1'>{notification.size}</span>
                     <i className="fa-regular fa-bell"></i>
                   </button>
-                  <button className="btn btn-warning" onClick={handleAddress}>
+                  <button className="btn btn-warning btn-sm" onClick={handleAddress}>
                     <i className="fa-regular fa-address-book"></i>
                   </button>
                 </div>
@@ -185,13 +215,13 @@ console.log(addressData)
 
 
               <div className="mt-3">
-                {menu === 'inbox' ? <Inbox user={user} /> : ''}
+                {menu === 'inbox' ? <Inbox user={user} setNotification={setNotifivation} notification={notification} setSearchMail={setSearchMail} searchMail={searchMail}/> : ''}
               </div>
               <div className="mt-3">
-                {menu === 'starred' ? <Starred user={user} /> : ''}
+                {menu === 'starred' ? <Starred user={user} searchMail={searchMail}/> : ''}
               </div>
               <div className="mt-3">
-                {menu === 'send' ? <Send user={user} /> : ''}
+                {menu === 'send' ? <Send user={user} setForm={setForm} setEditMail={setEditMail} setEmailId={setEmailId} searchMail={searchMail}/> : ''}
               </div>
 
 
@@ -225,7 +255,9 @@ console.log(addressData)
               <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div className="modal-body">
-              <form onSubmit={handleForm}>
+              
+              <form onSubmit={!editMail ? handleForm : handleUpdateForm}>
+
                 <div className="mb-2">
                   <input type="text" className="form-control" placeholder="To:" value={form.to} onChange={(e) => setForm({ ...form, to: e.target.value })} />
                 </div>
@@ -242,8 +274,13 @@ console.log(addressData)
                   <textarea className="form-control p-2" style={{ height: '3cm' }} placeholder="Write Email:" value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })}></textarea>
                 </div>
                 <div className="modal-footer">
+                  
                   <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                  <button type="submit" className="btn btn-warning">Send</button>
+                  {!editMail?<>
+                    <button type="submit" className="btn btn-warning">Send</button></>:<>
+                    <button type="submit" className="btn btn-warning">Update</button></>
+                    }
+                
                 </div>
               </form>
             </div>
@@ -255,3 +292,4 @@ console.log(addressData)
 };
 
 export default Dashboard;
+
